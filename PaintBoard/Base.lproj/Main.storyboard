@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12086"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -25,10 +26,19 @@
                                 <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="U3o-2l-Cku">
+                                <rect key="frame" x="26" y="627" width="38" height="30"/>
+                                <state key="normal" title="Undo"/>
+                                <connections>
+                                    <action selector="undoPainting:" destination="BYZ-38-t0r" eventType="touchUpInside" id="U7j-DC-W6Q"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="U3o-2l-Cku" secondAttribute="bottom" constant="10" id="Bpz-A3-6ms"/>
                             <constraint firstItem="lcd-De-rCj" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="F8s-jq-CwH"/>
+                            <constraint firstItem="U3o-2l-Cku" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="10" id="TYs-TG-rw7"/>
                             <constraint firstItem="lcd-De-rCj" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="jNU-U3-Y57"/>
                             <constraint firstAttribute="trailing" secondItem="lcd-De-rCj" secondAttribute="trailing" id="mYH-KA-Gmd"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="lcd-De-rCj" secondAttribute="bottom" id="zep-aB-epO"/>

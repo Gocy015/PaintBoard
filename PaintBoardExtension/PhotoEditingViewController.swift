@@ -26,12 +26,26 @@ class PhotoEditingViewController: UIViewController, PHContentEditingController {
         // Dispose of any resources that can be recreated.
     }
     
+    // MARK: - Actions
+    
+    @IBAction func undo(_ sender: Any) {
+        imagePainter.tryUndo()
+    }
+    
     // MARK: - PHContentEditingController
     
     func canHandle(_ adjustmentData: PHAdjustmentData) -> Bool {
         // Inspect the adjustmentData to determine whether your extension can work with past edits.
         // (Typically, you use its formatIdentifier and formatVersion properties to do this.)
-        return false
+        guard let version = Double(adjustmentData.formatVersion) else{
+            return false
+        }
+        
+        guard adjustmentData.formatIdentifier == "com.gocy.PaintBoard" else {
+            return false
+        }
+        
+        return version >= 0.2
     }
     
     func startContentEditing(with contentEditingInput: PHContentEditingInput, placeholderImage: UIImage) {
@@ -39,8 +53,11 @@ class PhotoEditingViewController: UIViewController, PHContentEditingController {
         // If you returned true from canHandleAdjustmentData:, contentEditingInput has the original image and adjustment data.
         // If you returned false, the contentEditingInput has past edits "baked in".
         input = contentEditingInput
-        
-        imagePainter.resetPainting()
+        if let adjustmentData = input?.adjustmentData?.data , let restoredData = NSKeyedUnarchiver.unarchiveObject(with: adjustmentData) as? [[CGPoint]]{
+            imagePainter.resetPainting(withData: restoredData)
+        }else{
+            imagePainter.resetPainting()
+        }
         imagePainter.image = contentEditingInput.displaySizeImage
         
     }
@@ -73,7 +90,7 @@ class PhotoEditingViewController: UIViewController, PHContentEditingController {
                     
                     try? jpeg.write(to: output.renderedContentURL, options: .atomic)
                     
-                    output.adjustmentData = PHAdjustmentData(formatIdentifier: "com.gocy.PaintBoard", formatVersion: "0.1", data: NSKeyedArchiver.archivedData(withRootObject: ["test"]))
+                    output.adjustmentData = PHAdjustmentData(formatIdentifier: "com.gocy.PaintBoard", formatVersion: "0.2", data: NSKeyedArchiver.archivedData(withRootObject: self.imagePainter.pointsList))
                 }
                 
             }

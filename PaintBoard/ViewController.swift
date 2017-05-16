@@ -49,6 +49,9 @@ class ViewController: UIViewController {
         doOpenPhotos()
     }
 
+    @IBAction func undoPainting(_ sender: Any) {
+        self.imagePainter.tryUndo()
+    }
 }
 
 //MARK: - PhotoLibrary Logic

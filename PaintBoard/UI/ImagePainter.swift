@@ -30,10 +30,9 @@ class ImagePainter: UIView {
             return getPaintedImage()
         }
     }
-    var paintPath : UIBezierPath!
-//    var resizedPaintPath : UIBezierPath!
-    var pointsList = [[CGPoint]]()
-    var resizeRatio : CGFloat = 1.0
+    private var paintPath : UIBezierPath!
+    private(set) var pointsList = [[CGPoint]]()
+    private var resizeRatio : CGFloat = 1.0
     
     //MARK: - Life cycle
     override init(frame: CGRect) {
@@ -64,15 +63,27 @@ class ImagePainter: UIView {
     }
     
     override func layoutSubviews() {
-//        imageView.frame = self.bounds
         paintLayer.frame = self.bounds
     }
     
-    func resetPainting(){
+    func resetPainting(withData list:[[CGPoint]] = []){
         paintPath = nil
-//        resizedPaintPath = nil
         pointsList.removeAll()
+        if list.count > 0{
+            paintPath = bezierPath(withPointList: list)
+            pointsList = list
+        }
         draw()
+    }
+    
+    @discardableResult func tryUndo() -> Bool{
+        if pointsList.count <= 0 {
+            return false
+        }
+        pointsList.removeLast()
+        paintPath = bezierPath(withPointList: pointsList)
+        draw()
+        return true
     }
     
     private func resizeImageView(size s:CGSize){
@@ -136,21 +147,12 @@ class ImagePainter: UIView {
             return nil
         }
         
-        let resizedPaintPath = UIBezierPath()
+        guard let resizedPaintPath = bezierPath(withPointList: pointsList ,ratioFactor: resizeRatio) else{
+            return nil
+        }
         resizedPaintPath.lineJoinStyle = .round
         resizedPaintPath.lineCapStyle = .round
         resizedPaintPath.lineWidth = defaultLineWidth * resizeRatio
-        
-        for points in pointsList{
-            if points.count < 0 {
-                return nil
-            }
-            resizedPaintPath.move(to: CGPoint(x :points.first!.x * resizeRatio ,y :points.first!.y * resizeRatio))
-            
-            for index in 1 ..< points.endIndex {
-                resizedPaintPath.addLine(to:CGPoint(x :points[index].x * resizeRatio ,y :points[index].y * resizeRatio))
-            }
-        }
         
         UIGraphicsBeginImageContext(original.size)
         original.draw(in: CGRect(x: 0, y: 0, width: original.size.width, height: original.size.height))
@@ -166,4 +168,20 @@ class ImagePainter: UIView {
         return painted
     }
     
+    
+    //MARK : - Helpers
+    func bezierPath(withPointList list:[[CGPoint]] ,ratioFactor factor:CGFloat = 1) -> UIBezierPath?{
+        let path = UIBezierPath()
+        for points in list{
+            if points.count < 0 {
+                return nil
+            }
+            path.move(to: CGPoint(x :points.first!.x * factor ,y :points.first!.y * factor))
+            
+            for index in 1 ..< points.endIndex {
+                path.addLine(to:CGPoint(x :points[index].x * factor ,y :points[index].y * factor))
+            }
+        }
+        return path
+    }
 }
