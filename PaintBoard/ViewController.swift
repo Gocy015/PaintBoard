@@ -110,6 +110,7 @@ extension ViewController{
         guard let paintedImage = imagePainter.paintedImage else{
             return
         }
+        PaintingManager.default.storeLatest(image: paintedImage)
         UIImageWriteToSavedPhotosAlbum(paintedImage, self, #selector(self.image(_:didFinishSavingWithError:contextInfo:)), nil)
     }
     

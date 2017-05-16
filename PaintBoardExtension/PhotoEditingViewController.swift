@@ -51,13 +51,16 @@ class PhotoEditingViewController: UIViewController, PHContentEditingController {
     func startContentEditing(with contentEditingInput: PHContentEditingInput, placeholderImage: UIImage) {
         // Present content for editing, and keep the contentEditingInput for use when closing the edit session.
         // If you returned true from canHandleAdjustmentData:, contentEditingInput has the original image and adjustment data.
+        
         // If you returned false, the contentEditingInput has past edits "baked in".
+        imagePainter.image = placeholderImage
+        imagePainter.resetPainting()
+        
         input = contentEditingInput
         if let adjustmentData = input?.adjustmentData?.data , let restoredData = NSKeyedUnarchiver.unarchiveObject(with: adjustmentData) as? [[CGPoint]]{
             imagePainter.resetPainting(withData: restoredData)
-        }else{
-            imagePainter.resetPainting()
         }
+        
         imagePainter.image = contentEditingInput.displaySizeImage
         
     }
@@ -111,7 +114,7 @@ class PhotoEditingViewController: UIViewController, PHContentEditingController {
     var shouldShowCancelConfirmation: Bool {
         // Determines whether a confirmation to discard changes should be shown to the user on cancel.
         // (Typically, this should be "true" if there are any unsaved changes.)
-        return false
+        return self.imagePainter.pointsList.count > 0
     }
     
     func cancelContentEditing() {
